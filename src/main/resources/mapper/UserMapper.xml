@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.activiti.dao.UserDao">
+    <resultMap id="BaseResultMap" type="com.activiti.entity.User">
+        <id column="uid" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="tel" property="tel" jdbcType="VARCHAR"/>
+        <result column="age" property="age" javaType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="PermisssionResultMap" type="com.activiti.entity.Permisssion">
+        <id column="pid" property="pid" jdbcType="INTEGER"/>
+        <result column="permissionname" property="permissionName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+      uid,username,password,tel,age
+    </sql>
+    <sql id="Permission_Column_List">
+        p.pid,p.permissionname
+    </sql>
+
+    <select id="list" parameterType="com.activiti.entity.User" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from user
+    </select>
+
+    <select id="login" parameterType="com.activiti.entity.User" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM USER
+        WHERE username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getPermission" parameterType="INTEGER" resultType="com.activiti.entity.Permisssion">
+        SELECT <include refid="Permission_Column_List"/> FROM USER u
+        LEFT JOIN USER_ROLE ur ON u.uid = ur.userid
+        LEFT JOIN ROLE r ON ur.roleid = r.rid
+        LEFT JOIN ROLE_PERMISSION rp ON r.rid = rp.roleid
+        LEFT JOIN PERMISSION p ON rp.permissionid = p.pid
+        WHERE u.uid = #{id,jdbcType=INTEGER}
+    </select>
+
+</mapper>

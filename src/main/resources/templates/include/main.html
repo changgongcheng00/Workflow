@@ -1,0 +1,46 @@
+<header class="head">
+    <div class="head-left">Workflow</div>
+    <div class="head-right">
+        <span>欢迎你</span>
+        <span id="currentUser"></span>
+        <span><a href="loginout">，退出登录</a></span>
+    </div>
+</header>
+<div class="body-left">
+    <ul>
+        <li class="submit">
+            <a href="activiti">请假OA开始</a>
+        </li>
+        <li class="resubmit">
+            <a href="submitform">调整申请(被驳回)</a>
+        </li>
+        <li class="tlapprove">
+            <a href="tlapprove">部门领导审批</a>
+        </li>
+        <li class="plapprove">
+            <a href="plapprove">平台负责人审批</a>
+        </li>
+        <li class="hrapprove">
+            <a href="hrapprove">人事审批</a>
+        </li>
+        <li class="myprocess">
+            <a href="myprocess">我发起的请假流程</a>
+        </li>
+        <li class="myhistory">
+            <a href="myhistory">我的请假历史</a>
+        </li>
+    </ul>
+</div>
+<script>
+    $(function () {
+        $.ajax({
+            url:"/activiti/getUser",
+            type:"post",
+            contentType:"application/json;charset=UTF-8",
+            dataType:"json",
+            success : function(data){
+                $("#currentUser").html(data.username);
+            }
+        })
+    })
+</script>
