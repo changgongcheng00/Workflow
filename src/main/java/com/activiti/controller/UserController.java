@@ -1,6 +1,8 @@
 package com.activiti.controller;
 
 import com.activiti.entity.User;
+import com.activiti.entity.UserInfo;
+import com.activiti.general.DataGrid;
 import com.activiti.general.ResponseData;
 import com.activiti.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +25,12 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping(value ="/list")
-    public List<User> list(){return userService.list();}
-
+    @GetMapping(value = "/userinfo")
+    public ModelAndView userinfo(){return new ModelAndView("userinfo");}
     @GetMapping(value = "/toLogin")
     public ModelAndView main(){
         return new ModelAndView("login");
     }
-
     @GetMapping(value = "/index")
     public ModelAndView index(){
         return new ModelAndView("index");
@@ -67,6 +67,16 @@ public class UserController {
     public User getUser(HttpServletRequest request){
         User user = (User)request.getSession().getAttribute("user");
         return user;
+    }
+    @PostMapping(value ="/getUserInfoList")
+    public DataGrid<UserInfo> getUserInfoList(@RequestParam("current") int current,@RequestParam("rowCount") int rowCount){
+        List<UserInfo> userInfoList = userService.getUserInfoList();
+        DataGrid<UserInfo> grid=new DataGrid<>();
+        grid.setRowCount(rowCount);
+        grid.setCurrent(current);
+        grid.setTotal(userInfoList.size());
+        grid.setRows(userInfoList);
+        return grid;
     }
 
 

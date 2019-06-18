@@ -48,4 +48,9 @@
         WHERE id=#{id}
     </select>
 
+    <delete id="remove" parameterType="int">
+        DELETE FROM leaveapply
+        WHERE id=#{id}
+    </delete>
+
 </mapper>

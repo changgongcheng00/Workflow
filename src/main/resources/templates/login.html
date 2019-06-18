@@ -28,6 +28,14 @@
 </body>
 <script th:inline="javascript" type="text/javascript">
     $("#login").click(function () {
+        login();
+    });
+    $("body").keydown(function(){
+        if(event.keyCode == "13"){
+            login();
+        }
+    });
+    function login(){
         var username = $("#username").val();
         var password = $("#password").val();
         if(username =="" || password == ""){
@@ -37,7 +45,7 @@
         var obj = {};
         obj.username = username;
         obj.password = password;
-
+        $("#login").attr("disabled","disabled");
         $.ajax({
             url:"/activiti/login",
             type:"post",
@@ -45,6 +53,7 @@
             data:JSON.stringify(obj),
             dataType:"json",
             success : function(data){
+                $("#login").removeAttr("disabled");
                 if(data.code == 0){
                     window.location.href="/activiti/index";
                 }else{
@@ -52,6 +61,6 @@
                 }
             }
         })
-    })
+    }
 </script>
 </html>

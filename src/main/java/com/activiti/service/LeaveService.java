@@ -45,4 +45,6 @@ public interface LeaveService {
 
     LeaveApply getleave(int id);
 
+    void remove(int id);
+
 }

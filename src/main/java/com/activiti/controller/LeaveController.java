@@ -8,6 +8,8 @@ import com.activiti.service.UserService;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -220,17 +222,15 @@ public class LeaveController {
      */
     @PostMapping(value="/task/submitcomplete/{taskid}/{submitType}")
     public ResponseData submitcomplete(@ModelAttribute("leaveApply") LeaveApply leaveApply,@PathVariable("taskid") String taskid,@PathVariable("submitType") String submitType){
-        ResponseData responseData = new ResponseData<>();
         try {
             leaveService.submitcomplete(taskid,leaveApply,submitType);
         } catch (ActivitiObjectNotFoundException e) {
-            return responseData.error(500,"任务已处理");
+            return ResponseData.error(500,"任务已处理");
         }
-        return responseData.success();
+        return ResponseData.success();
     }
     @PostMapping(value="/task/tlcomplete")
     public ResponseData tlcomplete(@RequestBody ApproveData approveData, HttpServletRequest request){
-        ResponseData responseData = new ResponseData<>();
         User user = (User)request.getSession().getAttribute("user");
         Map<String,Object> variables=new HashMap<String,Object>();
         variables.put("tlApprove", approveData.getApprove());
@@ -238,38 +238,36 @@ public class LeaveController {
         try {
             taskService.claim(approveData.getTaskid(), String.valueOf(user.getId()));
         } catch (ActivitiObjectNotFoundException e) {
-            return responseData.error(500,"任务已处理");
+            return ResponseData.error(500,"任务已处理");
         }
         taskService.complete(approveData.getTaskid(), variables);
-        return responseData.success();
+        return ResponseData.success();
     }
     @RequestMapping(value="/task/plcomplete",method = RequestMethod.POST)
     public ResponseData plcomplete(@RequestBody ApproveData approveData, HttpServletRequest request){
-        ResponseData responseData = new ResponseData<>();
         User user = (User)request.getSession().getAttribute("user");
         Map<String,Object> variables=new HashMap<String,Object>();
         variables.put("plApprove", approveData.getApprove());
         try {
             taskService.claim(approveData.getTaskid(), String.valueOf(user.getId()));
         } catch (ActivitiObjectNotFoundException e) {
-            return responseData.error(500,"任务已处理");
+            return ResponseData.error(500,"任务已处理");
         }
         taskService.complete(approveData.getTaskid(), variables);
-        return responseData.success();
+        return ResponseData.success();
     }
     @RequestMapping(value="/task/hrcomplete",method = RequestMethod.POST)
     public ResponseData hrcomplete(@RequestBody ApproveData approveData, HttpServletRequest request){
-        ResponseData responseData = new ResponseData<>();
         User user = (User)request.getSession().getAttribute("user");
         Map<String,Object> variables=new HashMap<String,Object>();
         variables.put("hrApprove", approveData.getApprove());
         try {
             taskService.claim(approveData.getTaskid(), String.valueOf(user.getId()));
         } catch (ActivitiObjectNotFoundException e) {
-            return responseData.error(500,"任务已处理");
+            return ResponseData.error(500,"任务已处理");
         }
         taskService.complete(approveData.getTaskid(), variables);
-        return responseData.success();
+        return ResponseData.success();
     }
     /**
      * Description 表单修改详情查询
@@ -354,18 +352,67 @@ public class LeaveController {
 
     @GetMapping(value = "traceProcess/{processInstanceId}")
     public void traceProcess(@PathVariable("processInstanceId") String processInstanceId,HttpServletResponse response) throws IOException {
+        //获取所有活动，用于测试
+        //List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
         ProcessInstance process = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
         BpmnModel bpmnModel = repositoryService.getBpmnModel(process.getProcessDefinitionId());
-        DefaultProcessDiagramGenerator  generator = new DefaultProcessDiagramGenerator();
         //获得所有历史活动，按时间升序排序
         List<HistoricActivityInstance> historicList = historyService.createHistoricActivityInstanceQuery()
-            .executionId(processInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
-        //计算活动线路，填入相关task名称
-        //此处需补全相关方法
-        InputStream png = generator.generateDiagram(bpmnModel, "png", activeActivityIds);
+            .processInstanceId(processInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
+        //计算活动线路，已执行的历史节点
+        List<String> executedActivitiIds = new ArrayList<>();
+        historicList.forEach(e->{executedActivitiIds.add(e.getActivityId());});
+        //已执行的flow集合
+        List<String> excutedFlowList = new ArrayList<>();
+        for (HistoricActivityInstance historic : historicList) {
+            FlowNode flowNode = (FlowNode)bpmnModel.getFlowElement(historic.getActivityId());
+            List<SequenceFlow> sequenceFlows = flowNode.getOutgoingFlows();
+            sequenceFlows.forEach(e->{
+                if(e.getTargetFlowElement().getId().equalsIgnoreCase(historic.getActivityId())){
+                    excutedFlowList.add(e.getId());
+                }
+            });
+        }
+        InputStream png = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", executedActivitiIds,
+            excutedFlowList,"黑体","黑体","黑体",null,1.0);
         ServletOutputStream outputStream = response.getOutputStream();
         IOUtils.copy(png,outputStream);
+    }
+
+    @GetMapping(value = "endProcess/{processInstanceId}")
+    public ResponseData processInstanceId(@PathVariable("processInstanceId")String processInstanceId){
+        /**
+         * Description 撤销流程 流程未结束
+         * @Param [processInstanceId]
+         * @Return com.activiti.general.ResponseData
+         * @Author zhangcheng
+         * @Date 2019/6/17 19:40
+         */
+        try {
+            runtimeService.deleteProcessInstance(processInstanceId,"任务主动撤销");
+            historyService.deleteHistoricProcessInstance(processInstanceId);
+        } catch (ActivitiObjectNotFoundException e) {
+            return ResponseData.error(5000,"资源已经删除");
+        }
+        return ResponseData.success();
+    }
+
+    @GetMapping(value = "removeProcess/{processInstanceId}")
+    public ResponseData removeProcess(@PathVariable("processInstanceId")String processInstanceId){
+        /**
+         * Description 删除历史记录 流程已经结束
+         * @Param [processInstanceId]
+         * @Return com.activiti.general.ResponseData
+         * @Author zhangcheng
+         * @Date 2019/6/17 19:40
+         */
+        try {
+            historyService.deleteHistoricProcessInstance(processInstanceId);
+            leaveService.remove(Integer.valueOf(processInstanceId));
+        } catch (ActivitiObjectNotFoundException e) {
+            return ResponseData.error(5000,"资源已经删除");
+        }
+        return ResponseData.success();
     }
 
 }

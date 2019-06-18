@@ -2,11 +2,12 @@ package com.activiti.dao;
 
 import com.activiti.entity.Permisssion;
 import com.activiti.entity.User;
+import com.activiti.entity.UserInfo;
 
 import java.util.List;
 
 public interface UserDao {
-    List<User> list();
+    List<UserInfo> getUserInfoList();
 
     User login(User user);
 

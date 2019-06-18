@@ -15,4 +15,6 @@ public interface LeaveDao {
     void update(LeaveApply leaveApply);
 
     LeaveApply get(int id);
+
+    void remove(int id);
 }

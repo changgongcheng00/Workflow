@@ -3,6 +3,7 @@ package com.activiti.service.impl;
 import com.activiti.dao.UserDao;
 import com.activiti.entity.Permisssion;
 import com.activiti.entity.User;
+import com.activiti.entity.UserInfo;
 import com.activiti.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,8 @@ public class UserServiceImpl implements UserService {
      * @Author zhangcheng
      */
     @Override
-    public List<User> list() {
-        return userDao.list();
+    public List<UserInfo> getUserInfoList() {
+        return userDao.getUserInfoList();
     }
 
     /**

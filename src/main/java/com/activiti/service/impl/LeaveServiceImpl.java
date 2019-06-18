@@ -133,4 +133,9 @@ public class LeaveServiceImpl implements LeaveService{
         return leaveDao.get(id);
     }
 
+    @Override
+    public void remove(int id){
+        leaveDao.remove(id);
+    }
+
 }
