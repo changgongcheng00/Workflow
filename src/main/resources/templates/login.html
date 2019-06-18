@@ -47,7 +47,7 @@
         obj.password = password;
         $("#login").attr("disabled","disabled");
         $.ajax({
-            url:"/activiti/login",
+            url:[[@{/}]]+"login",
             type:"post",
             contentType:"application/json;charset=UTF-8",
             data:JSON.stringify(obj),
@@ -55,7 +55,7 @@
             success : function(data){
                 $("#login").removeAttr("disabled");
                 if(data.code == 0){
-                    window.location.href="/activiti/index";
+                    window.location.href=[[@{/}]]+"index";
                 }else{
                     alert(data.msg);
                 }
