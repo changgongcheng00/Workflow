@@ -37,10 +37,8 @@
 <script>
     $(function () {
         $.ajax({
-            url:"/activiti/getUser",
+            url:"getUser",
             type:"post",
-            contentType:"application/json;charset=UTF-8",
-            dataType:"json",
             success : function(data){
                 $("#currentUser").html(data.username);
             }
