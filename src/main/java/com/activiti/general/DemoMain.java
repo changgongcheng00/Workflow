@@ -23,7 +23,7 @@ import java.util.Scanner;
 
 /**
  * @ClassName DemoMain
- * @Description Activiti 基本实现
+ * @Description Activiti 工作流基本流程代码和本地部署实现
  * @Author ch.zhang
  * @Date 2019/6/6 16:11
  **/

@@ -379,15 +379,15 @@ public class LeaveController {
         IOUtils.copy(png,outputStream);
     }
 
+    /**
+     * Description 撤销流程 流程未结束
+     * @Param [processInstanceId]
+     * @Return com.activiti.general.ResponseData
+     * @Author zhangcheng
+     * @Date 2019/6/17 19:40
+     */
     @GetMapping(value = "endProcess/{processInstanceId}")
     public ResponseData processInstanceId(@PathVariable("processInstanceId")String processInstanceId){
-        /**
-         * Description 撤销流程 流程未结束
-         * @Param [processInstanceId]
-         * @Return com.activiti.general.ResponseData
-         * @Author zhangcheng
-         * @Date 2019/6/17 19:40
-         */
         try {
             runtimeService.deleteProcessInstance(processInstanceId,"任务主动撤销");
             historyService.deleteHistoricProcessInstance(processInstanceId);
@@ -397,15 +397,15 @@ public class LeaveController {
         return ResponseData.success();
     }
 
+    /**
+     * Description 删除历史记录 流程已经结束
+     * @Param [processInstanceId]
+     * @Return com.activiti.general.ResponseData
+     * @Author zhangcheng
+     * @Date 2019/6/17 19:40
+     */
     @GetMapping(value = "removeProcess/{processInstanceId}")
     public ResponseData removeProcess(@PathVariable("processInstanceId")String processInstanceId){
-        /**
-         * Description 删除历史记录 流程已经结束
-         * @Param [processInstanceId]
-         * @Return com.activiti.general.ResponseData
-         * @Author zhangcheng
-         * @Date 2019/6/17 19:40
-         */
         try {
             historyService.deleteHistoricProcessInstance(processInstanceId);
             leaveService.remove(Integer.valueOf(processInstanceId));
