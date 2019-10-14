@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/activiti/**")
-            .allowedOrigins("*","https://i.youzu.com/")
+            .allowedOrigins("*","https://www.baidu.com/")
             .allowCredentials(true)
             .allowedMethods("GET","POST","PUT","DELETE","HEAD");
     }
