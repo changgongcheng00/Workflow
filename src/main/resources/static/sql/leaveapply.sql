@@ -21,7 +21,7 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `leaveapply`;
 CREATE TABLE `leaveapply` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `process_instance_id` varchar(45) CHARACTER SET utf8mb4mb4 COLLATE utf8mb4mb4_general_ci DEFAULT NULL COMMENT '发送',
+  `process_instance_id` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '发送',
   `user_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '请假人id',
   `start_time` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '开始时间',
   `end_time` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '结束时间',
